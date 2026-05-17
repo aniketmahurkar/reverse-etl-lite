@@ -1,0 +1,34 @@
+# Example: sync a dbt customer health model to Salesforce
+name: "customer_health_to_salesforce"
+schedule: "daily"
+
+source:
+  type: sqlite  # sqlite | csv | postgres
+  path: "demo/demo.db"
+  query: "SELECT * FROM customer_health_scores"
+
+destination:
+  type: console  # salesforce | hubspot | console
+  # For Salesforce:
+  # type: salesforce
+  # object: Account
+  # external_id_field: External_Id__c
+  # For HubSpot:
+  # type: hubspot
+  # object: companies
+
+mapping:
+  key_field: "external_id"
+  fields:
+    customer_id: "external_id"
+    company_name: "Name"
+    health_score: "Health_Score__c"
+    segment: "Segment__c"
+    last_contact_date: "Last_Contact_Date__c"
+    mrr: "MRR__c"
+    churn_risk: "Churn_Risk__c"
+  transforms:
+    Name: "strip"
+    Segment__c: "upper"
+  defaults:
+    Sync_Source__c: "dbt"
